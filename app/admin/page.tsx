@@ -16,6 +16,7 @@ import {
   Award,
   Mail,
   Eye,
+  LogOut,
 } from "lucide-react";
 
 interface BlobFile {
@@ -426,12 +427,24 @@ export default function AdminPage() {
               <p className="text-xs text-slate-500">Content Management</p>
             </div>
           </div>
-          <a
-            href="/"
-            className="rounded-lg border border-white/10 px-4 py-2 text-sm text-slate-400 hover:text-white"
-          >
-            View Site
-          </a>
+          <div className="flex items-center gap-3">
+            <a
+              href="/"
+              className="rounded-lg border border-white/10 px-4 py-2 text-sm text-slate-400 hover:text-white"
+            >
+              View Site
+            </a>
+            <button
+              onClick={async () => {
+                await fetch("/api/auth", { method: "DELETE" });
+                window.location.href = "/login";
+              }}
+              className="flex items-center gap-1.5 rounded-lg border border-white/10 px-4 py-2 text-sm text-slate-400 hover:text-red-400"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              Logout
+            </button>
+          </div>
         </div>
       </div>
 

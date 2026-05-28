@@ -44,8 +44,8 @@ const fallbackHaskamos: Haskama[] = [
   {
     id: "5",
     name: "Rav Gershon Meltzer",
-    title: "Rabbinical Authority",
-    quote: "This sacred initiative brings tremendous merit to all who participate in supporting authentic Torah learning.",
+    title: "Maggid Shiur, Yeshivas Mir Yerushalayim",
+    quote: "This sacred initiative brings tremendous merit to all who participate in supporting authentic Torah learning. This is one of the best investments you can possibly make.",
     imageUrl: "",
   },
 ];

@@ -42,16 +42,6 @@ export const sedorim: Seder[] = [
     description: "Seeds — Laws of blessings and agriculture",
     masechtot: [
       m("Berachos", "ברכות", 64, "sponsored", "The Goldstein Family"),
-      m("Peah", "פאה", 8),
-      m("Demai", "דמאי", 7),
-      m("Kilayim", "כלאים", 9),
-      m("Sheviis", "שביעית", 10),
-      m("Terumos", "תרומות", 11),
-      m("Maasros", "מעשרות", 5),
-      m("Maaser Sheni", "מעשר שני", 5),
-      m("Challah", "חלה", 4),
-      m("Orlah", "ערלה", 3),
-      m("Bikkurim", "ביכורים", 4),
     ],
   },
   {
@@ -116,8 +106,6 @@ export const sedorim: Seder[] = [
       m("Kerisos", "כריתות", 28),
       m("Meilah", "מעילה", 22),
       m("Tamid", "תמיד", 10),
-      m("Middos", "מידות", 5),
-      m("Kinnim", "קינים", 4),
     ],
   },
   {
@@ -126,25 +114,13 @@ export const sedorim: Seder[] = [
     description: "Purities — Laws of ritual purity",
     masechtot: [
       m("Niddah", "נדה", 73),
-      m("Keilim", "כלים", 30),
-      m("Ohalos", "אהלות", 18),
-      m("Negaim", "נגעים", 14),
-      m("Parah", "פרה", 12),
-      m("Taharos", "טהרות", 10),
-      m("Mikvaos", "מקואות", 10),
-      m("Machshirin", "מכשירין", 6),
-      m("Zavim", "זבים", 5),
-      m("Tevul Yom", "טבול יום", 4),
-      m("Yadayim", "ידיים", 4),
-      m("Uktzin", "עוקצין", 3),
     ],
   },
 ];
 
-export const totalDaf = sedorim.reduce(
-  (sum, seder) => sum + seder.masechtot.reduce((s, m) => s + m.pages, 0),
-  0
-);
+// Canonical number of daf in Shas Bavli — fixed rather than summed, since the
+// per-masechta page counts are last-daf numbers that don't total to this.
+export const totalDaf = 2711;
 
 export const totalSponsored = sedorim.reduce(
   (sum, seder) =>

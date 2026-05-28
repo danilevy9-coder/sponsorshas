@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Sparkles } from "lucide-react";
 import { sedorim } from "@/constants/shasData";
 import { MasechtaCard } from "./MasechtaCard";
 
@@ -48,6 +49,48 @@ export function ShasGrid() {
             Choose from {sedorim.length} Sedorim and their Masechtot. Each
             sponsorship supports a dedicated scholar learning on your behalf.
           </p>
+        </motion.div>
+
+        {/* Entire Shas offer */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="relative mb-12 overflow-hidden rounded-3xl border border-amber-500/20 bg-gradient-to-br from-amber-500/[0.08] via-amber-500/[0.03] to-transparent p-8 sm:p-10"
+        >
+          <div className="pointer-events-none absolute -top-20 -right-20 h-60 w-60 rounded-full bg-amber-500/[0.06] blur-[70px]" />
+          <div className="relative flex flex-col items-center gap-6 text-center sm:flex-row sm:justify-between sm:text-left">
+            <div>
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/[0.08] px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-amber-400">
+                <Sparkles className="h-3.5 w-3.5" />
+                Best Value
+              </div>
+              <h3 className="text-2xl font-bold text-white sm:text-3xl">
+                Sponsor the Entire Shas
+              </h3>
+              <p className="mt-2 max-w-md text-sm text-slate-400">
+                Dedicate all of Shas — the complete 2,711 daf — learned on your
+                behalf by our scholars.
+              </p>
+            </div>
+            <div className="flex flex-col items-center gap-4 sm:items-end">
+              <div className="flex items-baseline gap-3">
+                <span className="text-lg text-slate-500 line-through">
+                  $8,133
+                </span>
+                <span className="text-4xl font-bold text-amber-400">
+                  $6,000
+                </span>
+              </div>
+              <a
+                href="#contact"
+                className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 px-8 py-3.5 text-sm font-semibold text-black transition-all hover:shadow-[0_0_40px_-8px_rgba(212,175,55,0.5)]"
+              >
+                <span className="relative z-10">Sponsor the Entire Shas</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-yellow-400 opacity-0 transition-opacity group-hover:opacity-100" />
+              </a>
+            </div>
+          </div>
         </motion.div>
 
         {/* Tabs */}

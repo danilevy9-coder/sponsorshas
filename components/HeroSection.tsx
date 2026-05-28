@@ -150,7 +150,7 @@ export function HeroSection() {
         >
           {[
             { value: totalMasechtot, suffix: "", label: "Masechtot" },
-            { value: totalDaf, suffix: "+", label: "Total Daf" },
+            { value: totalDaf, suffix: "", label: "Total Daf" },
             { value: 3, suffix: "/daf", label: "Starting at", prefix: "$" },
           ].map((stat) => (
             <div key={stat.label}>

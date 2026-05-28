@@ -12,7 +12,7 @@ interface Avreich {
 
 const stats = [
   { icon: Users, value: "25+", label: "Dedicated Avreichim" },
-  { icon: BookOpen, value: "63", label: "Masechtot Covered" },
+  { icon: BookOpen, value: "38", label: "Masechtot Covered" },
   { icon: GraduationCap, value: "100%", label: "Talmidei Chachamim" },
   { icon: Clock, value: "Daily", label: "Consistent Learning" },
 ];

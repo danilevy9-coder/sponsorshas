@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Users, BookOpen, GraduationCap, Clock } from "lucide-react";
+import { Users, BookOpen, GraduationCap, Heart, Clock } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 interface Avreich {
   id: string;
@@ -10,10 +11,15 @@ interface Avreich {
   imageUrl: string;
 }
 
-const stats = [
+const stats: {
+  icon: LucideIcon;
+  icon2?: LucideIcon;
+  value: string;
+  label: string;
+}[] = [
   { icon: Users, value: "25+", label: "Dedicated Avreichim" },
   { icon: BookOpen, value: "38", label: "Masechtot Covered" },
-  { icon: GraduationCap, value: "100%", label: "Talmidei Chachamim" },
+  { icon: GraduationCap, icon2: Heart, value: "100%", label: "Torah and Chesed" },
   { icon: Clock, value: "Daily", label: "Consistent Learning" },
 ];
 
@@ -48,9 +54,9 @@ export function AvreichimSection() {
             Our Avreichim
           </h2>
           <p className="mx-auto max-w-2xl text-slate-400">
-            Our scholars are Yirei Shamayim and Talmidei Chachamim — God-fearing
-            and deeply learned. Each is assigned a different masechta, and
-            together they complete the entire Shas on your behalf.
+            Our Avreichim are experienced, dedicated Torah scholars. Each is
+            assigned a different masechta, and together they complete the entire
+            Shas on your behalf.
           </p>
         </motion.div>
 
@@ -65,8 +71,11 @@ export function AvreichimSection() {
               transition={{ delay: i * 0.1 }}
               className="group rounded-2xl border border-white/[0.06] bg-gradient-to-br from-white/[0.04] to-white/[0.01] p-6 text-center transition-all duration-500 hover:border-amber-500/15 hover:shadow-[0_8px_40px_-12px_rgba(212,175,55,0.1)]"
             >
-              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500/15 to-amber-600/5 ring-1 ring-amber-500/10 transition-all group-hover:scale-110 group-hover:ring-amber-500/20">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center gap-1 rounded-xl bg-gradient-to-br from-amber-500/15 to-amber-600/5 ring-1 ring-amber-500/10 transition-all group-hover:scale-110 group-hover:ring-amber-500/20">
                 <stat.icon className="h-5 w-5 text-amber-500/60" />
+                {stat.icon2 && (
+                  <stat.icon2 className="h-4 w-4 text-amber-500/60" />
+                )}
               </div>
               <div className="text-2xl font-bold text-white">{stat.value}</div>
               <div className="mt-1 text-xs text-slate-500">{stat.label}</div>
@@ -132,7 +141,6 @@ export function AvreichimSection() {
                         {scholar.name}
                       </p>
                     )}
-                    <p className="text-[11px] text-slate-400">Avreich</p>
                   </div>
                 </motion.div>
               ))}

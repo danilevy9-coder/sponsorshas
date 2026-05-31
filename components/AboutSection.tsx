@@ -52,7 +52,7 @@ export function AboutSection() {
           <div className="p-8 sm:p-10">
             <p className="mb-6 text-lg leading-relaxed text-slate-300">
               Sponsor Shas enables individuals to sponsor the learning of the
-              entire Talmud by a group of dedicated Talmidei Chachamim. Each
+              entire Talmud by a group of dedicated Torah scholars. Each
               scholar is assigned a different tractate, and collectively they
               complete all of Shas on the sponsor&apos;s behalf.
             </p>
@@ -63,10 +63,10 @@ export function AboutSection() {
               most powerful spiritual acts one can perform.
             </p>
             <p className="leading-relaxed text-slate-400">
-              Our Avreichim are experienced, dedicated Torah scholars who learn
-              each masechta with depth and devotion. With over 25 scholars in our
-              program, the entire Shas is learned with the highest standard of
-              Torah study.
+              Our Avreichim are experienced, dedicated Torah scholars.
+              Collectively, they learn the entire Shas Bavli — what for many is
+              the achievement of a lifetime — on behalf of you or your loved
+              one.
             </p>
           </div>
         </motion.div>

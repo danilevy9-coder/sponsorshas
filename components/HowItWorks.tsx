@@ -16,7 +16,7 @@ const steps = [
     icon: Users,
     title: "A Scholar is Assigned",
     description:
-      "Your sponsored masechta is assigned to one of our 25+ dedicated Avreichim who will learn it in depth.",
+      "Your sponsored masechta is assigned to one of our 25+ dedicated Avreichim who will learn it on your behalf.",
     gradient: "from-purple-500/20 to-purple-600/5",
     iconColor: "text-purple-400",
   },

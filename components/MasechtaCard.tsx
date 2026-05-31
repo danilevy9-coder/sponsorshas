@@ -77,7 +77,14 @@ export function MasechtaCard({ masechta, index }: MasechtaCardProps) {
               </p>
             </div>
           ) : (
-            <button className="relative w-full cursor-pointer overflow-hidden rounded-lg border border-amber-500/20 bg-amber-500/[0.08] px-4 py-2.5 text-sm font-medium text-amber-400 transition-all duration-300 hover:border-amber-500/40 hover:bg-amber-500/15 hover:text-amber-300 hover:shadow-[0_0_20px_-5px_rgba(212,175,55,0.15)]">
+            <button
+              onClick={() =>
+                document
+                  .getElementById("contact")
+                  ?.scrollIntoView({ behavior: "smooth" })
+              }
+              className="relative w-full cursor-pointer overflow-hidden rounded-lg border border-amber-500/20 bg-amber-500/[0.08] px-4 py-2.5 text-sm font-medium text-amber-400 transition-all duration-300 hover:border-amber-500/40 hover:bg-amber-500/15 hover:text-amber-300 hover:shadow-[0_0_20px_-5px_rgba(212,175,55,0.15)]"
+            >
               Sponsor This Masechta
             </button>
           )}

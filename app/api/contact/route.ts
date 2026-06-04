@@ -1,6 +1,7 @@
 import { put, list } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { requireAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -121,6 +122,8 @@ export async function POST(request: Request) {
 
 // GET — list all submissions (for admin)
 export async function GET() {
+  const denied = await requireAdmin();
+  if (denied) return denied;
   try {
     const data = await getData();
     return NextResponse.json(data);
@@ -131,6 +134,8 @@ export async function GET() {
 
 // PATCH — mark as read
 export async function PATCH(request: Request) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
   try {
     const { id } = await request.json();
     const data = await getData();
@@ -145,6 +150,8 @@ export async function PATCH(request: Request) {
 
 // DELETE — remove a submission
 export async function DELETE(request: Request) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
   try {
     const { id } = await request.json();
     const data = await getData();

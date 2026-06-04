@@ -1,5 +1,6 @@
 import { put, list, del } from "@vercel/blob";
 import { NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
@@ -70,6 +71,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
   try {
     const formData = await request.formData();
     const name = (formData.get("name") as string) || "";
@@ -108,6 +111,8 @@ export async function POST(request: Request) {
 }
 
 export async function PATCH(request: Request) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
   try {
     const formData = await request.formData();
     const id = formData.get("id") as string;
@@ -144,6 +149,8 @@ export async function PATCH(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
   try {
     const { id } = await request.json();
     const data = await getData();

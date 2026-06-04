@@ -1,10 +1,13 @@
 import { list, del } from "@vercel/blob";
 import { NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
 
 export async function GET(request: Request) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
   try {
     const { searchParams } = new URL(request.url);
     const prefix = searchParams.get("folder") || undefined;
@@ -21,6 +24,8 @@ export async function GET(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
   try {
     const { url } = await request.json();
     await del(url);

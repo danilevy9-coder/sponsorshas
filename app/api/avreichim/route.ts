@@ -1,5 +1,6 @@
 import { put, list, del } from "@vercel/blob";
 import { NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
@@ -76,6 +77,8 @@ export async function GET() {
 
 // POST — add one OR many avreichim (bulk)
 export async function POST(request: Request) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
   try {
     const contentType = request.headers.get("content-type") || "";
 
@@ -134,6 +137,8 @@ export async function POST(request: Request) {
 
 // PATCH — update an avreich's name
 export async function PATCH(request: Request) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
   try {
     const { id, name } = await request.json();
     const data = await getData();
@@ -151,6 +156,8 @@ export async function PATCH(request: Request) {
 
 // DELETE — remove an avreich by id
 export async function DELETE(request: Request) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
   try {
     const { id } = await request.json();
     const data = await getData();

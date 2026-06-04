@@ -1,9 +1,12 @@
 import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File;

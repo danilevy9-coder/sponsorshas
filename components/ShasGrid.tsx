@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { sedorim } from "@/constants/shasData";
 import { MasechtaCard } from "./MasechtaCard";
+import { SponsorProvider, EntireShasButton } from "./SponsorContext";
 
 export function ShasGrid() {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -16,6 +17,7 @@ export function ShasGrid() {
   const total = activeSeder.masechtot.length;
 
   return (
+    <SponsorProvider>
     <section id="shas" className="relative bg-slate-950 px-6 py-28">
       {/* Background accent */}
       <div className="pointer-events-none absolute inset-0">
@@ -82,13 +84,7 @@ export function ShasGrid() {
                   $6,000
                 </span>
               </div>
-              <a
-                href="#contact"
-                className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 px-8 py-3.5 text-sm font-semibold text-black transition-all hover:shadow-[0_0_40px_-8px_rgba(212,175,55,0.5)]"
-              >
-                <span className="relative z-10">Sponsor the Entire Shas</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-yellow-400 opacity-0 transition-opacity group-hover:opacity-100" />
-              </a>
+              <EntireShasButton />
             </div>
           </div>
         </motion.div>
@@ -175,5 +171,6 @@ export function ShasGrid() {
         </AnimatePresence>
       </div>
     </section>
+    </SponsorProvider>
   );
 }

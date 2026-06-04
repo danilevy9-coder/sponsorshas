@@ -132,3 +132,13 @@ export const totalMasechtot = sedorim.reduce(
   (sum, seder) => sum + seder.masechtot.length,
   0
 );
+
+// Price for sponsoring the whole Shas (the discounted "Best Value" offer).
+export const ENTIRE_SHAS_PRICE = 6000;
+
+// Flat list of every masechta, for lookups by name (e.g. checkout pricing).
+export const allMasechtot: Masechta[] = sedorim.flatMap((s) => s.masechtot);
+
+export function findMasechta(name: string): Masechta | undefined {
+  return allMasechtot.find((m) => m.name === name);
+}

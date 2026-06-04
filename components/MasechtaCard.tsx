@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { BookOpen, Sparkles } from "lucide-react";
+import { BookOpen, Check, Sparkles } from "lucide-react";
 import type { Masechta } from "@/constants/shasData";
+import { useSponsor } from "./SponsorContext";
 
 interface MasechtaCardProps {
   masechta: Masechta;
@@ -11,6 +12,8 @@ interface MasechtaCardProps {
 
 export function MasechtaCard({ masechta, index }: MasechtaCardProps) {
   const isSponsored = masechta.status === "sponsored";
+  const { isSelected, toggle } = useSponsor();
+  const selected = isSelected(masechta.name);
 
   return (
     <motion.div
@@ -78,14 +81,21 @@ export function MasechtaCard({ masechta, index }: MasechtaCardProps) {
             </div>
           ) : (
             <button
-              onClick={() =>
-                document
-                  .getElementById("contact")
-                  ?.scrollIntoView({ behavior: "smooth" })
-              }
-              className="relative w-full cursor-pointer overflow-hidden rounded-lg border border-amber-500/20 bg-amber-500/[0.08] px-4 py-2.5 text-sm font-medium text-amber-400 transition-all duration-300 hover:border-amber-500/40 hover:bg-amber-500/15 hover:text-amber-300 hover:shadow-[0_0_20px_-5px_rgba(212,175,55,0.15)]"
+              onClick={() => toggle(masechta)}
+              className={`relative flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg border px-4 py-2.5 text-sm font-medium transition-all duration-300 ${
+                selected
+                  ? "border-amber-500/50 bg-amber-500/20 text-amber-200"
+                  : "border-amber-500/20 bg-amber-500/[0.08] text-amber-400 hover:border-amber-500/40 hover:bg-amber-500/15 hover:text-amber-300 hover:shadow-[0_0_20px_-5px_rgba(212,175,55,0.15)]"
+              }`}
             >
-              Sponsor This Masechta
+              {selected ? (
+                <>
+                  <Check className="h-4 w-4" />
+                  Selected
+                </>
+              ) : (
+                "Sponsor This Masechta"
+              )}
             </button>
           )}
         </div>

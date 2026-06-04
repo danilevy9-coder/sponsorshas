@@ -8,10 +8,12 @@ import { HaskamosSection } from "@/components/HaskamosSection";
 import { AboutSection } from "@/components/AboutSection";
 import { ContactSection } from "@/components/ContactSection";
 import { Footer } from "@/components/Footer";
+import { SponsorSuccessToast } from "@/components/SponsorContext";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-slate-950">
+      <SponsorSuccessToast />
       <Navbar />
       <HeroSection />
       <ShasGrid />

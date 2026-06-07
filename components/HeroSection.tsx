@@ -2,7 +2,7 @@
 
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { ArrowDown } from "lucide-react";
-import { totalDaf, totalMasechtot } from "@/constants/shasData";
+import { totalDaf, displayMasechtot } from "@/constants/shasData";
 import { useEffect, useRef } from "react";
 
 function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: string }) {
@@ -149,7 +149,7 @@ export function HeroSection() {
           className="grid grid-cols-3 gap-8 rounded-2xl border border-white/[0.06] bg-white/[0.02] px-8 py-8 backdrop-blur-sm"
         >
           {[
-            { value: totalMasechtot, suffix: "", label: "Masechtot" },
+            { value: displayMasechtot, suffix: "", label: "Masechtot" },
             { value: totalDaf, suffix: "", label: "Total Daf" },
             { value: 3, suffix: "/daf", label: "Starting at", prefix: "$" },
           ].map((stat) => (

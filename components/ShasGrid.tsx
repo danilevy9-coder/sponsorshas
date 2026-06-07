@@ -8,7 +8,8 @@ import { MasechtaCard } from "./MasechtaCard";
 import { SponsorProvider, EntireShasButton } from "./SponsorContext";
 
 export function ShasGrid() {
-  const [activeIndex, setActiveIndex] = useState(0);
+  // Default to Moed (index 1) — Zeraim has only one masechta and looks bare.
+  const [activeIndex, setActiveIndex] = useState(1);
   const activeSeder = sedorim[activeIndex];
 
   const sponsored = activeSeder.masechtot.filter(

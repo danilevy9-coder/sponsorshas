@@ -18,7 +18,7 @@ const stats: {
   label: string;
 }[] = [
   { icon: Users, value: "25+", label: "Dedicated Avreichim" },
-  { icon: BookOpen, value: "38", label: "Masechtot Covered" },
+  { icon: BookOpen, value: "39", label: "Masechtot Covered" },
   { icon: GraduationCap, icon2: Heart, value: "100%", label: "Torah and Chesed" },
   { icon: Clock, value: "Daily", label: "Consistent Learning" },
 ];

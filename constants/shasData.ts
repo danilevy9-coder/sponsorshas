@@ -133,6 +133,11 @@ export const totalMasechtot = sedorim.reduce(
   0
 );
 
+// Public-facing masechta count. We show 39 — the number associated with the
+// Daf Yomi cycle (which counts Shekalim) that goes with the well-known 2,711
+// daf — rather than the raw list length.
+export const displayMasechtot = 39;
+
 // Price for sponsoring the whole Shas (the discounted "Best Value" offer).
 export const ENTIRE_SHAS_PRICE = 6000;
 

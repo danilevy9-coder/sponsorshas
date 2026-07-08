@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { sedorim } from "@/constants/shasData";
@@ -12,8 +12,24 @@ export function ShasGrid() {
   const [activeIndex, setActiveIndex] = useState(1);
   const activeSeder = sedorim[activeIndex];
 
+  // Live sponsorships: masechta name -> dedication text. Fetched at runtime so
+  // real (and admin-added) sponsorships appear, and expire after two months.
+  const [sponsors, setSponsors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    fetch("/api/sponsors", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data: { masechta: string; sponsor: string }[]) => {
+        if (!Array.isArray(data)) return;
+        const map: Record<string, string> = {};
+        for (const s of data) map[s.masechta] = s.sponsor;
+        setSponsors(map);
+      })
+      .catch(() => {});
+  }, []);
+
   const sponsored = activeSeder.masechtot.filter(
-    (m) => m.status === "sponsored"
+    (m) => sponsors[m.name]
   ).length;
   const total = activeSeder.masechtot.length;
 
@@ -166,7 +182,12 @@ export function ShasGrid() {
             className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
           >
             {activeSeder.masechtot.map((masechta, i) => (
-              <MasechtaCard key={masechta.name} masechta={masechta} index={i} />
+              <MasechtaCard
+                key={masechta.name}
+                masechta={masechta}
+                index={i}
+                sponsor={sponsors[masechta.name]}
+              />
             ))}
           </motion.div>
         </AnimatePresence>

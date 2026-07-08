@@ -1,6 +1,7 @@
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { findMasechta, ENTIRE_SHAS_PRICE } from "@/constants/shasData";
+import { getActiveSponsorships } from "@/lib/sponsors";
 
 export const dynamic = "force-dynamic";
 
@@ -48,11 +49,24 @@ export async function POST(request: Request) {
       ];
     } else {
       const names = Array.isArray(body.items) ? body.items : [];
+
+      // Don't let two people sponsor the same masechta — drop any that already
+      // have an active sponsorship. Failing open (treating none as sponsored)
+      // is fine; the worst case is a duplicate the admin can sort out.
+      let alreadySponsored = new Set<string>();
+      try {
+        const active = await getActiveSponsorships();
+        alreadySponsored = new Set(active.map((s) => s.masechta));
+      } catch (err) {
+        console.error("Could not load active sponsorships:", err);
+      }
+
       // Price every selected masechta from server-side data — never trust the
-      // client for amounts. Unknown names are dropped.
+      // client for amounts. Unknown or already-sponsored names are dropped.
       lineItems = names
         .map((name) => findMasechta(name))
         .filter((m): m is NonNullable<typeof m> => Boolean(m))
+        .filter((m) => !alreadySponsored.has(m.name))
         .map((m) => ({
           quantity: 1,
           price_data: {
@@ -64,7 +78,10 @@ export async function POST(request: Request) {
 
       if (lineItems.length === 0) {
         return NextResponse.json(
-          { error: "No valid masechtot were selected." },
+          {
+            error:
+              "Those masechtot are no longer available — they may have just been sponsored.",
+          },
           { status: 400 }
         );
       }

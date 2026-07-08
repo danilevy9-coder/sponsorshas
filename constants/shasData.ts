@@ -1,12 +1,8 @@
-export type SponsorshipStatus = "available" | "sponsored";
-
 export interface Masechta {
   name: string;
   hebrewName: string;
   pages: number;
   price: number;
-  status: SponsorshipStatus;
-  sponsor?: string;
 }
 
 export interface Seder {
@@ -18,30 +14,25 @@ export interface Seder {
 
 const PRICE_PER_DAF = 3;
 
-function m(
-  name: string,
-  hebrewName: string,
-  pages: number,
-  status: SponsorshipStatus = "available",
-  sponsor?: string
-): Masechta {
+function m(name: string, hebrewName: string, pages: number): Masechta {
   return {
     name,
     hebrewName,
     pages,
     price: pages * PRICE_PER_DAF,
-    status,
-    sponsor,
   };
 }
 
+// The canonical list of every masechta. Sponsorship state is no longer baked
+// in here — it lives in the sponsorship store (see lib/sponsors.ts) so it can
+// be added/removed at runtime and expire after two months.
 export const sedorim: Seder[] = [
   {
     name: "Zeraim",
     hebrewName: "זרעים",
     description: "Seeds — Laws of blessings and agriculture",
     masechtot: [
-      m("Berachos", "ברכות", 64, "sponsored", "The Goldstein Family"),
+      m("Berachos", "ברכות", 64),
     ],
   },
   {
@@ -49,9 +40,9 @@ export const sedorim: Seder[] = [
     hebrewName: "מועד",
     description: "Festivals — Laws of Shabbos and holidays",
     masechtot: [
-      m("Shabbos", "שבת", 157, "sponsored", "In memory of Rav Moshe ben Yaakov"),
+      m("Shabbos", "שבת", 157),
       m("Eruvin", "עירובין", 105),
-      m("Pesachim", "פסחים", 121, "sponsored", "The Schwartz Family"),
+      m("Pesachim", "פסחים", 121),
       m("Shekalim", "שקלים", 22),
       m("Yoma", "יומא", 88),
       m("Sukkah", "סוכה", 56),
@@ -69,7 +60,7 @@ export const sedorim: Seder[] = [
     description: "Women — Laws of marriage and vows",
     masechtot: [
       m("Yevamos", "יבמות", 122),
-      m("Kesubos", "כתובות", 112, "sponsored", "L'iluy Nishmas Sarah bas Dovid"),
+      m("Kesubos", "כתובות", 112),
       m("Nedarim", "נדרים", 91),
       m("Nazir", "נזיר", 66),
       m("Sotah", "סוטה", 49),
@@ -83,7 +74,7 @@ export const sedorim: Seder[] = [
     description: "Damages — Civil and criminal law",
     masechtot: [
       m("Bava Kamma", "בבא קמא", 119),
-      m("Bava Metzia", "בבא מציעא", 119, "sponsored", "The Friedman Foundation"),
+      m("Bava Metzia", "בבא מציעא", 119),
       m("Bava Basra", "בבא בתרא", 176),
       m("Sanhedrin", "סנהדרין", 113),
       m("Makkos", "מכות", 24),
@@ -99,7 +90,7 @@ export const sedorim: Seder[] = [
     masechtot: [
       m("Zevachim", "זבחים", 120),
       m("Menachos", "מנחות", 110),
-      m("Chullin", "חולין", 142, "sponsored", "Dedicated by the Katz Family"),
+      m("Chullin", "חולין", 142),
       m("Bechoros", "בכורות", 61),
       m("Arachin", "ערכין", 34),
       m("Temurah", "תמורה", 34),
@@ -121,12 +112,6 @@ export const sedorim: Seder[] = [
 // Canonical number of daf in Shas Bavli — fixed rather than summed, since the
 // per-masechta page counts are last-daf numbers that don't total to this.
 export const totalDaf = 2711;
-
-export const totalSponsored = sedorim.reduce(
-  (sum, seder) =>
-    sum + seder.masechtot.filter((m) => m.status === "sponsored").length,
-  0
-);
 
 export const totalMasechtot = sedorim.reduce(
   (sum, seder) => sum + seder.masechtot.length,

@@ -17,7 +17,10 @@ import {
   Mail,
   Eye,
   LogOut,
+  Sparkles,
+  Calendar,
 } from "lucide-react";
+import { sedorim, allMasechtot } from "@/constants/shasData";
 
 interface BlobFile {
   url: string;
@@ -50,7 +53,21 @@ interface ContactMsg {
   read: boolean;
 }
 
+interface Sponsorship {
+  id: string;
+  masechta: string;
+  sponsor: string;
+  createdAt: number;
+  expiresAt: number | null;
+}
+
+// Hebrew-name lookup for displaying sponsorships.
+const HEBREW_BY_NAME: Record<string, string> = Object.fromEntries(
+  allMasechtot.map((m) => [m.name, m.hebrewName])
+);
+
 const FOLDERS = [
+  { id: "sponsors-manager", label: "Sponsors", description: "Manage masechta sponsors", icon: Sparkles },
   { id: "avreichim-manager", label: "Avreichim", description: "Manage scholars", icon: Users },
   { id: "haskamos-manager", label: "Haskamos", description: "Manage endorsements", icon: Award },
   { id: "messages", label: "Messages", description: "Contact submissions", icon: Mail },
@@ -87,6 +104,16 @@ export default function AdminPage() {
   // Messages state
   const [messages, setMessages] = useState<ContactMsg[]>([]);
 
+  // Sponsors state
+  const [sponsorships, setSponsorships] = useState<Sponsorship[]>([]);
+  const [spMasechta, setSpMasechta] = useState("");
+  const [spSponsor, setSpSponsor] = useState("");
+  const [spPermanent, setSpPermanent] = useState(false);
+  const [addingSponsor, setAddingSponsor] = useState(false);
+  // "Now" captured at load time so we can show days-remaining without reading
+  // the clock during render.
+  const [nowTs, setNowTs] = useState(0);
+
   // Inline editing (avreichim)
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
@@ -96,14 +123,29 @@ export default function AdminPage() {
   const [editingHaskama, setEditingHaskama] = useState({ name: "", title: "", quote: "" });
   const [editingHaskamaPhoto, setEditingHaskamaPhoto] = useState<File | null>(null);
 
+  const isSponsorsManager = activeFolder === "sponsors-manager";
   const isAvreichimManager = activeFolder === "avreichim-manager";
   const isHaskamosManager = activeFolder === "haskamos-manager";
   const isMessages = activeFolder === "messages";
 
+  // Sections backed by their own APIs rather than the generic image store.
+  const MANAGER_FOLDERS = [
+    "sponsors-manager",
+    "avreichim-manager",
+    "haskamos-manager",
+    "messages",
+  ];
+
   const loadFiles = useCallback(
     async (folder?: string) => {
       const f = folder || activeFolder;
-      if (f === "avreichim-manager" || f === "haskamos-manager" || f === "messages") return;
+      if (
+        f === "sponsors-manager" ||
+        f === "avreichim-manager" ||
+        f === "haskamos-manager" ||
+        f === "messages"
+      )
+        return;
       setLoading(true);
       try {
         const res = await fetch(`/api/images?folder=${f}`);
@@ -153,11 +195,67 @@ export default function AdminPage() {
     setLoading(false);
   }, []);
 
+  const loadSponsors = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/sponsors?_t=${Date.now()}`, { cache: "no-store" });
+      const data = await res.json();
+      setSponsorships(Array.isArray(data) ? data : []);
+    } catch {
+      setSponsorships([]);
+    }
+    setNowTs(Date.now());
+    setLoading(false);
+  }, []);
+
   useEffect(() => {
+    if (isSponsorsManager) loadSponsors();
     if (isAvreichimManager) loadAvreichim();
     if (isHaskamosManager) loadHaskamos();
     if (isMessages) loadMessages();
-  }, [isAvreichimManager, isHaskamosManager, isMessages, loadAvreichim, loadHaskamos, loadMessages]);
+  }, [isSponsorsManager, isAvreichimManager, isHaskamosManager, isMessages, loadSponsors, loadAvreichim, loadHaskamos, loadMessages]);
+
+  const addSponsor = async () => {
+    if (!spMasechta) return;
+    setAddingSponsor(true);
+    setUploadError(null);
+    try {
+      const res = await fetch("/api/sponsors", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          masechta: spMasechta,
+          sponsor: spSponsor.trim(),
+          permanent: spPermanent,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setUploadError(data.error || "Failed to add sponsor");
+      } else {
+        setSpMasechta("");
+        setSpSponsor("");
+        setSpPermanent(false);
+        if (data.all) setSponsorships(data.all);
+        else await loadSponsors();
+      }
+    } catch (err) {
+      setUploadError(String(err));
+    }
+    setAddingSponsor(false);
+  };
+
+  const deleteSponsor = async (id: string) => {
+    if (!confirm("Remove this sponsor? The masechta will become available again.")) return;
+    const res = await fetch("/api/sponsors", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    const data = await res.json();
+    if (data.all) setSponsorships(data.all);
+    else await loadSponsors();
+  };
 
   const addAvreich = async () => {
     if (!newName.trim() && !newPhoto) return;
@@ -462,7 +560,7 @@ export default function AdminPage() {
                   setActiveFolder(folder.id);
                   setFiles([]);
                   setUploadError(null);
-                  if (folder.id !== "avreichim-manager" && folder.id !== "haskamos-manager" && folder.id !== "messages") {
+                  if (!MANAGER_FOLDERS.includes(folder.id)) {
                     loadFiles(folder.id);
                   }
                 }}
@@ -485,7 +583,209 @@ export default function AdminPage() {
 
           {/* Main content */}
           <div>
-            {isAvreichimManager ? (
+            {isSponsorsManager ? (
+              /* ─── SPONSORS MANAGER ─── */
+              <div>
+                {/* Add form */}
+                <div className="mb-6 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
+                  <h3 className="mb-1 flex items-center gap-2 text-base font-semibold text-white">
+                    <Sparkles className="h-5 w-5 text-amber-500" />
+                    Add a Sponsor
+                  </h3>
+                  <p className="mb-4 text-xs text-slate-500">
+                    Manually mark a masechta as sponsored. It shows on the site
+                    for 2 months and then rests automatically — unless you pin it
+                    as permanent.
+                  </p>
+
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                    <div className="flex-1">
+                      <label className="mb-1.5 block text-xs font-medium text-slate-500">
+                        Masechta
+                      </label>
+                      <select
+                        value={spMasechta}
+                        onChange={(e) => setSpMasechta(e.target.value)}
+                        className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-4 py-2.5 text-sm text-white outline-none focus:border-amber-500/40"
+                      >
+                        <option value="">Select a masechta…</option>
+                        {sedorim.map((seder) => (
+                          <optgroup
+                            key={seder.name}
+                            label={`${seder.name} — ${seder.hebrewName}`}
+                          >
+                            {seder.masechtot.map((mm) => {
+                              const taken = sponsorships.some(
+                                (s) => s.masechta === mm.name
+                              );
+                              return (
+                                <option
+                                  key={mm.name}
+                                  value={mm.name}
+                                  disabled={taken}
+                                >
+                                  {mm.name} ({mm.hebrewName})
+                                  {taken ? " — already sponsored" : ""}
+                                </option>
+                              );
+                            })}
+                          </optgroup>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="flex-1">
+                      <label className="mb-1.5 block text-xs font-medium text-slate-500">
+                        Dedication / Sponsor name
+                      </label>
+                      <input
+                        type="text"
+                        value={spSponsor}
+                        onChange={(e) => setSpSponsor(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") addSponsor();
+                        }}
+                        placeholder="e.g. The Goldstein Family"
+                        className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none focus:border-amber-500/40"
+                      />
+                    </div>
+                    <button
+                      onClick={addSponsor}
+                      disabled={addingSponsor || !spMasechta}
+                      className="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-amber-600 to-amber-500 px-6 py-2.5 text-sm font-semibold text-black transition-opacity hover:opacity-90 disabled:opacity-50"
+                    >
+                      {addingSponsor ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <UserPlus className="h-4 w-4" />
+                      )}
+                      Add
+                    </button>
+                  </div>
+
+                  <label className="mt-3 flex cursor-pointer items-center gap-2 text-xs text-slate-400">
+                    <input
+                      type="checkbox"
+                      checked={spPermanent}
+                      onChange={(e) => setSpPermanent(e.target.checked)}
+                      className="h-3.5 w-3.5 accent-amber-500"
+                    />
+                    Permanent — never expires (skip the 2-month reset)
+                  </label>
+
+                  {uploadError && (
+                    <p className="mt-3 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-2 text-xs text-red-400">
+                      {uploadError}
+                    </p>
+                  )}
+                </div>
+
+                {/* Loading */}
+                {loading && (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="h-6 w-6 animate-spin text-amber-500" />
+                  </div>
+                )}
+
+                {/* Empty state */}
+                {!loading && sponsorships.length === 0 && (
+                  <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] px-6 py-12 text-center">
+                    <Sparkles className="mx-auto mb-3 h-8 w-8 text-slate-600" />
+                    <p className="text-sm text-slate-500">
+                      No active sponsorships. Add one above, or they&apos;ll
+                      appear here automatically when someone sponsors online.
+                    </p>
+                  </div>
+                )}
+
+                {/* Sponsorships list */}
+                {sponsorships.length > 0 && (
+                  <div>
+                    <p className="mb-4 text-sm text-slate-500">
+                      {sponsorships.length} active sponsorship
+                      {sponsorships.length !== 1 ? "s" : ""} — exactly what shows
+                      as &ldquo;Sponsored&rdquo; on the site
+                    </p>
+                    <div className="space-y-3">
+                      {sponsorships
+                        .slice()
+                        .sort((a, b) => b.createdAt - a.createdAt)
+                        .map((s) => {
+                          const daysLeft =
+                            s.expiresAt == null
+                              ? null
+                              : Math.ceil((s.expiresAt - nowTs) / 86400000);
+                          return (
+                            <div
+                              key={s.id}
+                              className="group flex items-start justify-between gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 transition-all hover:border-white/[0.12]"
+                            >
+                              <div className="min-w-0">
+                                <p className="flex items-center gap-2 text-sm font-semibold text-white">
+                                  {s.masechta}
+                                  <span className="font-serif text-amber-500/50">
+                                    {HEBREW_BY_NAME[s.masechta] || ""}
+                                  </span>
+                                </p>
+                                <p className="mt-0.5 text-xs italic text-amber-500/70">
+                                  {s.sponsor}
+                                </p>
+                                <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                                  <span className="flex items-center gap-1">
+                                    <Calendar className="h-3 w-3" />
+                                    Sponsored{" "}
+                                    {new Date(s.createdAt).toLocaleDateString(
+                                      "en-US",
+                                      {
+                                        month: "short",
+                                        day: "numeric",
+                                        year: "numeric",
+                                      }
+                                    )}
+                                  </span>
+                                  {s.expiresAt == null ? (
+                                    <span className="text-emerald-400/70">
+                                      Never expires
+                                    </span>
+                                  ) : (
+                                    <span
+                                      className={
+                                        daysLeft != null && daysLeft <= 7
+                                          ? "text-amber-400"
+                                          : ""
+                                      }
+                                    >
+                                      Expires{" "}
+                                      {new Date(
+                                        s.expiresAt
+                                      ).toLocaleDateString("en-US", {
+                                        month: "short",
+                                        day: "numeric",
+                                        year: "numeric",
+                                      })}
+                                      {daysLeft != null && daysLeft >= 0
+                                        ? ` (${daysLeft} day${
+                                            daysLeft !== 1 ? "s" : ""
+                                          } left)`
+                                        : ""}
+                                    </span>
+                                  )}
+                                </p>
+                              </div>
+                              <button
+                                onClick={() => deleteSponsor(s.id)}
+                                className="shrink-0 rounded p-1.5 text-slate-600 opacity-0 transition-all hover:text-red-400 group-hover:opacity-100"
+                                title="Remove sponsor"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : isAvreichimManager ? (
               /* ─── AVREICHIM MANAGER ─── */
               <div>
                 {/* ── Bulk upload zone ── */}

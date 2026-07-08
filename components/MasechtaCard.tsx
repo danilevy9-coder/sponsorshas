@@ -8,10 +8,13 @@ import { useSponsor } from "./SponsorContext";
 interface MasechtaCardProps {
   masechta: Masechta;
   index: number;
+  // Dedication text when this masechta is currently sponsored; undefined when
+  // it's available. Comes from the live sponsorship store.
+  sponsor?: string;
 }
 
-export function MasechtaCard({ masechta, index }: MasechtaCardProps) {
-  const isSponsored = masechta.status === "sponsored";
+export function MasechtaCard({ masechta, index, sponsor }: MasechtaCardProps) {
+  const isSponsored = Boolean(sponsor);
   const { isSelected, toggle } = useSponsor();
   const selected = isSelected(masechta.name);
 
@@ -75,9 +78,7 @@ export function MasechtaCard({ masechta, index }: MasechtaCardProps) {
           {/* Bottom section */}
           {isSponsored ? (
             <div className="rounded-lg border border-amber-500/10 bg-amber-500/[0.04] px-3 py-2.5">
-              <p className="text-xs text-amber-500/50 italic">
-                {masechta.sponsor}
-              </p>
+              <p className="text-xs text-amber-500/50 italic">{sponsor}</p>
             </div>
           ) : (
             <button
